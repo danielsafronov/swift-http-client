@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpRequestHeaderKey enumeration.
-enum HttpRequestHeaderKey: String {
+public enum HttpRequestHeaderKey: String {
     case authorization = "Authorization"
     case contentType = "Content-Type"
     case accept = "Accept"

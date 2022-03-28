@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpStatusCode enumeration.
-enum HttpStatusCode: Int {
+public enum HttpStatusCode: Int {
     /// 2xx :
     case ok = 200
     case created = 201
@@ -30,7 +30,7 @@ enum HttpStatusCode: Int {
 }
 
 extension HttpStatusCode {
-    var isSuccess: Bool {
+    public var isSuccess: Bool {
         let successCodes = 200...299
         return successCodes.contains(self.rawValue)
     }

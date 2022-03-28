@@ -8,9 +8,9 @@
 import Foundation
 
 /// HttpClientRequestBuilder class.
-final class HttpClientRequestBuilder {
+internal final class HttpClientRequestBuilder {
     /// Response error transform closure typealias.
-    typealias ResponseErrorTransformer = (HttpResponseError) -> Error
+    internal typealias ResponseErrorTransformer = (HttpResponseError) -> Error
     
     /// HttpClientRequestParametersProtocol instance.
     private let parameters: HttpClientRequestParametersProtocol
@@ -70,9 +70,9 @@ final class HttpClientRequestBuilder {
 }
 
 /// URLComponentsBuilder class.
-fileprivate final class URLComponentsBuilder {
+internal final class URLComponentsBuilder {
     /// URL query parameters dictionary typealias.
-    typealias QueryParameters = [String: String]
+    internal typealias QueryParameters = [String: String]
     
     /// URL string.
     private let url: String
@@ -108,9 +108,9 @@ fileprivate final class URLComponentsBuilder {
 }
 
 /// URLRequestBuilder class.
-fileprivate final class URLRequestBuilder {
+internal final class URLRequestBuilder {
     /// Request body parameters dictionary typealias.
-    typealias BodyParameters = [String: String]
+    internal typealias BodyParameters = [String: String]
     
     /// Request headers dictionary typealias.
     typealias Headers = [String: String]

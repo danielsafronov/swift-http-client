@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpClientRequestParametersProtocol protocol.
-protocol HttpClientRequestParametersProtocol {
+public protocol HttpClientRequestParametersProtocol {
     var url: String { get }
     var method: HttpRequestMethod { get }
     var body: [String: String]? { get set }

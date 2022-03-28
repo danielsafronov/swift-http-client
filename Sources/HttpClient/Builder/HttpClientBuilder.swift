@@ -8,9 +8,9 @@
 import Foundation
 
 /// HttpClientBuilder class.
-final class HttpClientBuilder {
+public final class HttpClientBuilder {
     /// Response error transform closure typealias.
-    typealias ResponseErrorTransformer = (HttpResponseError) -> Error
+    public typealias ResponseErrorTransformer = (HttpResponseError) -> Error
     
     /// Response error transform closure.
     private var responseErrorTransformer: ResponseErrorTransformer?

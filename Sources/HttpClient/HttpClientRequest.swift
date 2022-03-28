@@ -8,8 +8,8 @@
 import Foundation
 
 /// HttpClientRequest class.
-final class HttpClientRequest {
-    typealias ResponseErrorMapper = (HttpResponseError) -> Error
+internal final class HttpClientRequest {
+    internal typealias ResponseErrorMapper = (HttpResponseError) -> Error
     
     /// URLRequest instance.
     private let request: URLRequest

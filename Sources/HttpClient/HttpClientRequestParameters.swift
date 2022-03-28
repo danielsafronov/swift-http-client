@@ -8,12 +8,12 @@
 import Foundation
 
 /// HttpClientRequestParameters structure.
-struct HttpClientRequestParameters: HttpClientRequestParametersProtocol {
-    var url: String
-    var method: HttpRequestMethod
-    var body: [String : String]? = nil
-    var query: [String : String]? = nil
-    var headers: [HttpRequestHeader]? = [
+public struct HttpClientRequestParameters: HttpClientRequestParametersProtocol {
+    public var url: String
+    public var method: HttpRequestMethod
+    public var body: [String : String]? = nil
+    public var query: [String : String]? = nil
+    public var headers: [HttpRequestHeader]? = [
         .init(key: .accept, value: "application/json"),
         .init(key: .contentType, value: "application/json")
     ]

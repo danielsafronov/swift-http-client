@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpClientError enumeration.
-enum HttpClientError: Error {
+internal enum HttpClientError: Error {
     case invalidURL
     case invalidResponse
     case decode

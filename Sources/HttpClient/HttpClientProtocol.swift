@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpClientProtocol protocol.
-protocol HttpClientProtocol {
+public protocol HttpClientProtocol {
     /// Performs HTTP request.
     /// - parameter endpoint: An instance of HttpClientRequestParametersProtocol.
     /// - returns: An instance of Result.

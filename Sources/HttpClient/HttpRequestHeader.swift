@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpRequestHeader structure.
-struct HttpRequestHeader {
+public struct HttpRequestHeader {
     let key: HttpRequestHeaderKey
     let value: String
 }
