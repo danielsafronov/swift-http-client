@@ -9,6 +9,6 @@ import Foundation
 
 /// HttpResponseError structure.
 public struct HttpResponseError: Error {
-    let data: Data
-    let response: URLResponse
+    public let data: Data
+    public let response: URLResponse
 }
