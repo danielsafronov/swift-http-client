@@ -13,9 +13,20 @@ public struct HttpClientRequestParameters: HttpClientRequestParametersProtocol {
     public var method: HttpRequestMethod
     public var body: [String : String]? = nil
     public var query: [String : String]? = nil
-    public var headers: [HttpRequestHeader]? = [
-        .init(key: .accept, value: "application/json"),
-        .init(key: .contentType, value: "application/json")
-    ]
+    public var headers: [HttpRequestHeader]? = nil
+    
+    /// Initializer.
+    /// - parameter url: URL string.
+    /// - parameter method: An instance of HttpRequestMethod.
+    /// - parameter body: Request body parameters dictionary.
+    /// - parameter query: URL query parameters dictionary.
+    /// - parameter headers: Request headers dictionary.
+    public init(url: String, method: HttpRequestMethod, body: [String: String]? = nil, query: [String: String]? = nil, headers: [HttpRequestHeader]? = nil) {
+        self.url = url
+        self.method = method
+        self.body = body
+        self.query = query
+        self.headers = headers
+    }
 }
 
