@@ -15,6 +15,9 @@ public final class HttpClientBuilder {
     /// Response error transform closure.
     private var responseErrorTransformer: ResponseErrorTransformer?
     
+    /// Initializer.
+    public init() {}
+    
     /// Adds transform closure for the HttpClient instance.
     /// - parameter transform: Response error transform closure.
     /// - returns: An instance of HttpClientBuilder.
