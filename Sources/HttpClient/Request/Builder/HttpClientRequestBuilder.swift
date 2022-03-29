@@ -8,26 +8,14 @@
 import Foundation
 
 /// HttpClientRequestBuilder class.
-internal final class HttpClientRequestBuilder {
-    /// Response error transform closure typealias.
-    internal typealias ResponseErrorTransformer = (HttpResponseError) -> Error
-    
-    /// HttpClientRequestParametersProtocol instance.
-    private let parameters: HttpClientRequestParametersProtocol
-    
+public final class HttpClientRequestBuilder {
     /// Response error transform closure.
-    private var responseErrorTransformer: ResponseErrorTransformer?
-    
-    /// Initializer.
-    /// - parameter parameters: An instance of HttpClientRequestParametersProtocol.
-    init (parameters: HttpClientRequestParametersProtocol) {
-        self.parameters = parameters
-    }
+    private var responseErrorTransformer: HttpResponseErrorTransformer?
     
     /// Adds transform closure for the HttpClientRequest instance.
     /// - parameter transform: Response error transform closure.
     /// - returns: An instance of HttpClientRequestBuilder.
-    public func withMapError(_ transformer: ResponseErrorTransformer?) -> Self {
+    public func withMapError(_ transformer: HttpResponseErrorTransformer?) -> Self {
         responseErrorTransformer = transformer
         return self
     }
@@ -35,9 +23,9 @@ internal final class HttpClientRequestBuilder {
     /// Creates and returns an instance of HttpClientRequest.
     /// - returns: An instance of HttpClientRequest.
     /// - throws: If something went wrong.
-    public func build() throws -> HttpClientRequest {
+    public func build(with parameters: HttpClientRequestParameters) throws -> HttpClientRequest {
         let request = try buildHttpClientRequest(parameters: parameters)
-        request.responseErrorMapper = responseErrorTransformer
+        request.responseErrorTransformer = responseErrorTransformer
         
         return request
     }
@@ -46,7 +34,7 @@ internal final class HttpClientRequestBuilder {
     /// - parameter parameters: An instance of HttpClientRequestParametersProtocol.
     /// - returns: An instance of HttpClientRequest.
     /// - throws: If something went wrong.
-    private func buildHttpClientRequest(parameters: HttpClientRequestParametersProtocol) throws -> HttpClientRequest {
+    private func buildHttpClientRequest(parameters: HttpClientRequestParameters) throws -> HttpClientRequest {
         let urlComponents = try URLComponentsBuilder(url: parameters.url)
             .withQueryParameters(parameters: parameters.query)
             .build()
@@ -56,7 +44,7 @@ internal final class HttpClientRequestBuilder {
         }
         
         var headers: [String: String]? = nil
-        if let headerPairs = parameters.headers?.map({($0.key.rawValue, $0.value) }) {
+        if let headerPairs = parameters.headers?.map({($0.key, $0.value) }) {
             headers = .init(uniqueKeysWithValues: headerPairs)
         }
         

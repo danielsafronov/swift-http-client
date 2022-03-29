@@ -8,26 +8,24 @@
 import Foundation
 
 /// HttpClientRequest class.
-internal final class HttpClientRequest {
-    internal typealias ResponseErrorMapper = (HttpResponseError) -> Error
-    
+public final class HttpClientRequest {
     /// URLRequest instance.
-    private let request: URLRequest
+    public let urlRequest: URLRequest
     
-    /// Unprocessable content error map closure.
-    public var responseErrorMapper: ResponseErrorMapper?
+    /// Response error transform closure.
+    public var responseErrorTransformer: HttpResponseErrorTransformer?
     
     /// Initializer.
     /// - parameter request: An instance of URLRequest.
     init (request: URLRequest) {
-        self.request = request
+        self.urlRequest = request
     }
     
     /// Performs request execution and returns result of it.
     /// - returns: A result of request executuion.
     public func execute<T>() async -> Result<T, Error> where T: Decodable {
         do {
-            let (data, urlResponse) = try await URLSession.shared.data(for: request, delegate: nil)
+            let (data, urlResponse) = try await URLSession.shared.data(for: urlRequest, delegate: nil)
             let response: T = try handleResponse(data: data, response: urlResponse)
             
             return .success(response)
@@ -45,7 +43,7 @@ internal final class HttpClientRequest {
             throw HttpClientError.invalidResponse
         }
         
-        guard let statusCode = HttpStatusCode(rawValue: response.statusCode) else {
+        guard let statusCode = HttpResponseStatusCode(rawValue: response.statusCode) else {
             throw HttpClientError.unsupportedStatusCode
         }
         
@@ -53,8 +51,8 @@ internal final class HttpClientRequest {
             return try decodeResponseData(data: data)
         } else {
             let error = HttpResponseError(data: data, response: response)
-            if let responseErrorMapper = responseErrorMapper {
-                throw responseErrorMapper(error)
+            if let responseErrorTransformer = responseErrorTransformer {
+                throw responseErrorTransformer(error)
             }
             
             throw error

@@ -12,5 +12,5 @@ public protocol HttpClientProtocol {
     /// Performs HTTP request.
     /// - parameter endpoint: An instance of HttpClientRequestParametersProtocol.
     /// - returns: An instance of Result.
-    func request<T: Decodable>(params: HttpClientRequestParametersProtocol) async -> Result<T, Error>
+    func request<T: Decodable>(params: HttpClientRequestParameters) async -> Result<T, Error>
 }

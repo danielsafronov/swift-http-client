@@ -9,11 +9,8 @@ import Foundation
 
 /// HttpClientBuilder class.
 public final class HttpClientBuilder {
-    /// Response error transform closure typealias.
-    public typealias ResponseErrorTransformer = (HttpResponseError) -> Error
-    
     /// Response error transform closure.
-    private var responseErrorTransformer: ResponseErrorTransformer?
+    private var responseErrorTransformer: HttpResponseErrorTransformer?
     
     /// Initializer.
     public init() {}
@@ -21,7 +18,7 @@ public final class HttpClientBuilder {
     /// Adds transform closure for the HttpClient instance.
     /// - parameter transform: Response error transform closure.
     /// - returns: An instance of HttpClientBuilder.
-    public func withMapError(_ transform: ResponseErrorTransformer?) -> Self {
+    public func withMapError(_ transform: HttpResponseErrorTransformer?) -> Self {
         responseErrorTransformer = transform
         return self
     }
@@ -29,7 +26,7 @@ public final class HttpClientBuilder {
     /// Creates and returns an instance of HttpClient.
     /// - returns: An instance of HttpClient.
     public func build() -> HttpClient {
-        let httpClient = HttpClient()
+        let httpClient = HttpClient(requestBuilder: .init())
         httpClient.responseErrorTransformer = responseErrorTransformer
         
         return httpClient

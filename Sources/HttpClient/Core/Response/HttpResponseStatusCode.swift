@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpStatusCode enumeration.
-public enum HttpStatusCode: Int {
+public enum HttpResponseStatusCode: Int {
     /// 2xx :
     case ok = 200
     case created = 201
@@ -29,7 +29,7 @@ public enum HttpStatusCode: Int {
     case getwayTimeout = 504
 }
 
-extension HttpStatusCode {
+extension HttpResponseStatusCode {
     public var isSuccess: Bool {
         let successCodes = 200...299
         return successCodes.contains(self.rawValue)

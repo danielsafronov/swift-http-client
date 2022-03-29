@@ -9,6 +9,6 @@ import Foundation
 
 /// HttpRequestMethod enumeration.
 public enum HttpRequestMethod: String {
-    case get = "get"
-    case post = "post"
+    case get = "GET"
+    case post = "POST"
 }

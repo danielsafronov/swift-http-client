@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpClientRequestParameters structure.
-public struct HttpClientRequestParameters: HttpClientRequestParametersProtocol {
+public struct HttpClientRequestParameters {
     public var url: String
     public var method: HttpRequestMethod
     public var body: [String : String]? = nil
@@ -30,3 +30,13 @@ public struct HttpClientRequestParameters: HttpClientRequestParametersProtocol {
     }
 }
 
+extension HttpClientRequestParameters {
+    public mutating func withHeader(_ header: HttpRequestHeader) {
+        if var headers = headers {
+            headers.append(header)
+            self.headers = headers
+        } else {
+            headers = [header]
+        }
+    }
+}

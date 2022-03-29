@@ -9,20 +9,26 @@ import Foundation
 
 /// HttpClient class.
 public final class HttpClient: HttpClientProtocol {
-    /// Response error transform closure typealias.
-    public typealias ResponseErrorTransformer = (HttpResponseError) -> Error
-
     /// Response error transform closure.
-    public var responseErrorTransformer: ResponseErrorTransformer?
+    public var responseErrorTransformer: HttpResponseErrorTransformer?
     
-    /// Performs HTTP request.
-    /// - parameter endpoint: An instance of HttpClientRequestParametersProtocol.
+    /// HttpClientRequestBuilder instance.
+    private let requestBuilder: HttpClientRequestBuilder
+    
+    /// Create a new HttpClient instance.
+    /// - parameter requestBuilder: An instance of HttpClientRequestBuilder.
+    public init(requestBuilder: HttpClientRequestBuilder) {
+        self.requestBuilder = requestBuilder
+    }
+    
+    /// Perform HTTP request.
+    /// - parameter endpoint: An instance of HttpClientRequestParameters.
     /// - returns: An instance of Result.
-    public func request<T: Decodable>(params: HttpClientRequestParametersProtocol) async -> Result<T, Error> {
+    public func request<T: Decodable>(params: HttpClientRequestParameters) async -> Result<T, Error> {
         do {
-            return try await HttpClientRequestBuilder(parameters: params)
+            return try await requestBuilder
                 .withMapError(responseErrorTransformer)
-                .build()
+                .build(with: params)
                 .execute()
         } catch {
             return .failure(error)
