@@ -9,6 +9,9 @@ import Foundation
 
 /// HttpClientRequestBuilder class.
 public final class HttpClientRequestBuilder: HttpClientRequestBuilderProtocol {
+    /// Request headers transform closure.
+    private var requestHeadersTransformer: HttpClientRequestHeadersTransformer?
+    
     /// Create a new HttpClientRequestProtocol instance.
     /// - parameter prameters: An instance of HttpClientRequestParameters.
     /// - returns: An instance of HttpClientRequestProtocol.
@@ -30,12 +33,25 @@ public final class HttpClientRequestBuilder: HttpClientRequestBuilderProtocol {
             throw HttpClientError.invalidURL
         }
         
+        var headers = parameters.headers
+        if let requestHeadersTransformer = requestHeadersTransformer {
+            headers = requestHeadersTransformer(headers)
+        }
+        
         let request = URLRequestBuilder(url: url, method: parameters.method.rawValue)
             .withBodyParameters(parameters.bodyParameters)
-            .withHeaders(parameters.headers)
+            .withHeaders(headers)
             .build()
         
         return .init(urlRequest: request)
+    }
+    
+    /// Register request headers transform closure.
+    /// - parameter transform: Request headers transform closure.
+    /// - returns: An instance of HttpClientRequestBuilder.
+    public func withMapHeaders(_ transform: HttpClientRequestHeadersTransformer?) -> Self {
+        requestHeadersTransformer = transform
+        return self
     }
 }
 
