@@ -26,7 +26,7 @@ public final class HttpClientBuilder: HttpClientBuilderProtocol {
     }
     
     /// Register a HttpClientRequestBuilderProtocol instance.
-    /// - parameter executorBuilder: An instance of HttpClientRequestBuilderProtocol.
+    /// - parameter requestBuilder: An instance of HttpClientRequestBuilderProtocol.
     /// - returns: An instance of HttpClientBuilder.
     public func withRequestBuilder(_ requestBuilder: HttpClientRequestBuilderProtocol) -> Self {
         self.requestBuilder = requestBuilder
@@ -42,9 +42,9 @@ public final class HttpClientBuilder: HttpClientBuilderProtocol {
     }
     
     /// Register a HttpClientResponseHandlerBuilderProtocol instance.
-    /// - parameter executorBuilder: An instance of HttpClientRequestBuilderProtocol.
+    /// - parameter responseHandlerBuilder: An instance of HttpClientResponseHandlerBuilderProtocol.
     /// - returns: An instance of HttpClientBuilder.
-    public func withRequestBuilder(_ responseHandlerBuilder: HttpClientResponseHandlerBuilderProtocol) -> Self {
+    public func withResponseHandlerBuilder(_ responseHandlerBuilder: HttpClientResponseHandlerBuilderProtocol) -> Self {
         self.responseHandlerBuilder = responseHandlerBuilder
         return self
     }
