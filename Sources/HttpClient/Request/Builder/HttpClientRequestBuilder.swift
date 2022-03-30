@@ -12,6 +12,9 @@ public final class HttpClientRequestBuilder: HttpClientRequestBuilderProtocol {
     /// Request headers transform closure.
     private var requestHeadersTransformer: HttpClientRequestHeadersTransformer?
     
+    /// Create a new HttpClientRequestBuilder instance.
+    public init() {}
+    
     /// Create a new HttpClientRequestProtocol instance.
     /// - parameter prameters: An instance of HttpClientRequestParameters.
     /// - returns: An instance of HttpClientRequestProtocol.
