@@ -9,8 +9,8 @@ import Foundation
 
 /// HttpClientProtocol protocol.
 public protocol HttpClientProtocol {
-    /// Performs HTTP request.
-    /// - parameter endpoint: An instance of HttpClientRequestParametersProtocol.
+    /// Perform request.
+    /// - parameter params: An instance of HttpClientRequestParameters.
     /// - returns: An instance of Result.
-    func request<T: Decodable>(params: HttpClientRequestParameters) async -> Result<T, Error>
+    func request<Response: Decodable>(parameters: HttpClientRequestParameters) async -> Result<Response, Error>
 }

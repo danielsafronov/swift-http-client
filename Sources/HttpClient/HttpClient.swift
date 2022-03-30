@@ -8,28 +8,40 @@
 import Foundation
 
 /// HttpClient class.
-public final class HttpClient: HttpClientProtocol {
-    /// Response error transform closure.
-    public var responseErrorTransformer: HttpResponseErrorTransformer?
-    
+public struct HttpClient: HttpClientProtocol {
     /// HttpClientRequestBuilder instance.
-    private let requestBuilder: HttpClientRequestBuilder
+    private let requestBuilder: HttpClientRequestBuilderProtocol
+    
+    /// HttpClientExecutorBuilderProtocol instance.
+    private let executorBuilder: HttpClientExecutorBuilderProtocol
+    
+    /// HttpClientResponseHandlerProtocol instance.
+    private let responseHandlerBuilder: HttpClientResponseHandlerBuilderProtocol
     
     /// Create a new HttpClient instance.
-    /// - parameter requestBuilder: An instance of HttpClientRequestBuilder.
-    public init(requestBuilder: HttpClientRequestBuilder) {
+    /// - parameter requestBuilder: An instance of HttpClientRequestBuilderProtocol.
+    /// - parameter executorBuilder: An instance of HttpClientExecutorBuilderProtocol.
+    /// - parameter responseHandlerBuilder: An instance of HttpClientResponseHandlerBuilderProtocol.
+    public init(
+        requestBuilder: HttpClientRequestBuilderProtocol,
+        executorBuilder: HttpClientExecutorBuilderProtocol,
+        responseHandlerBuilder: HttpClientResponseHandlerBuilderProtocol
+    ) {
         self.requestBuilder = requestBuilder
+        self.executorBuilder = executorBuilder
+        self.responseHandlerBuilder = responseHandlerBuilder
     }
     
     /// Perform HTTP request.
     /// - parameter endpoint: An instance of HttpClientRequestParameters.
     /// - returns: An instance of Result.
-    public func request<T: Decodable>(params: HttpClientRequestParameters) async -> Result<T, Error> {
+    public func request<Response>(parameters: HttpClientRequestParameters) async -> Result<Response, Error> where Response: Decodable {
         do {
-            return try await requestBuilder
-                .withMapError(responseErrorTransformer)
-                .build(with: params)
-                .execute()
+            let httpRequest = try requestBuilder.build(with: parameters)
+            let httpResponse = try await executorBuilder.build().execute(request: httpRequest)
+            let response: Response = try responseHandlerBuilder.build().handle(response: httpResponse)
+            
+            return .success(response)
         } catch {
             return .failure(error)
         }

@@ -7,66 +7,8 @@
 
 import Foundation
 
-/// HttpClientRequest class.
-public final class HttpClientRequest {
+/// HttpClientRequest structure.
+public struct HttpClientRequest: HttpClientRequestProtocol {
     /// URLRequest instance.
     public let urlRequest: URLRequest
-    
-    /// Response error transform closure.
-    public var responseErrorTransformer: HttpResponseErrorTransformer?
-    
-    /// Initializer.
-    /// - parameter request: An instance of URLRequest.
-    init (request: URLRequest) {
-        self.urlRequest = request
-    }
-    
-    /// Performs request execution and returns result of it.
-    /// - returns: A result of request executuion.
-    public func execute<T>() async -> Result<T, Error> where T: Decodable {
-        do {
-            let (data, urlResponse) = try await URLSession.shared.data(for: urlRequest, delegate: nil)
-            let response: T = try handleResponse(data: data, response: urlResponse)
-            
-            return .success(response)
-        } catch {
-            return .failure(error)
-        }
-    }
-    
-    /// Handles an HTTP response with data.
-    /// - parameter data: An instance of Data.
-    /// - parameter response: An instance of URLResponse.
-    /// - throws: If something went wrong.
-    private func handleResponse<T>(data: Data, response: URLResponse) throws -> T where T: Decodable{
-        guard let response = response as? HTTPURLResponse else {
-            throw HttpClientError.invalidResponse
-        }
-        
-        guard let statusCode = HttpResponseStatusCode(rawValue: response.statusCode) else {
-            throw HttpClientError.unsupportedStatusCode
-        }
-        
-        if statusCode.isSuccess {
-            return try decodeResponseData(data: data)
-        } else {
-            let error = HttpResponseError(data: data, response: response)
-            if let responseErrorTransformer = responseErrorTransformer {
-                throw responseErrorTransformer(error)
-            }
-            
-            throw error
-        }
-    }
-    
-    /// Decodes the response data.
-    /// - parameter data: An instance of Data.
-    /// - throws: If the data cannot be decoded.
-    private func decodeResponseData<T>(data: Data) throws -> T where T: Decodable {
-        guard let decodedData = try? JSONDecoder().decode(T.self, from: data) else {
-            throw HttpClientError.decode
-        }
-        
-        return decodedData
-    }
 }

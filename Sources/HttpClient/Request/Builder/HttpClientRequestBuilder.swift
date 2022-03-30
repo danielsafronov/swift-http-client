@@ -8,26 +8,13 @@
 import Foundation
 
 /// HttpClientRequestBuilder class.
-public final class HttpClientRequestBuilder {
-    /// Response error transform closure.
-    private var responseErrorTransformer: HttpResponseErrorTransformer?
-    
-    /// Adds transform closure for the HttpClientRequest instance.
-    /// - parameter transform: Response error transform closure.
-    /// - returns: An instance of HttpClientRequestBuilder.
-    public func withMapError(_ transformer: HttpResponseErrorTransformer?) -> Self {
-        responseErrorTransformer = transformer
-        return self
-    }
-    
-    /// Creates and returns an instance of HttpClientRequest.
-    /// - returns: An instance of HttpClientRequest.
+public final class HttpClientRequestBuilder: HttpClientRequestBuilderProtocol {
+    /// Create a new HttpClientRequestProtocol instance.
+    /// - parameter prameters: An instance of HttpClientRequestParameters.
+    /// - returns: An instance of HttpClientRequestProtocol.
     /// - throws: If something went wrong.
-    public func build(with parameters: HttpClientRequestParameters) throws -> HttpClientRequest {
-        let request = try buildHttpClientRequest(parameters: parameters)
-        request.responseErrorTransformer = responseErrorTransformer
-        
-        return request
+    public func build(with parameters: HttpClientRequestParameters) throws -> HttpClientRequestProtocol {
+        try buildHttpClientRequest(parameters: parameters)
     }
     
     /// Creates and returns an instance of HttpClientRequest.
@@ -36,24 +23,19 @@ public final class HttpClientRequestBuilder {
     /// - throws: If something went wrong.
     private func buildHttpClientRequest(parameters: HttpClientRequestParameters) throws -> HttpClientRequest {
         let urlComponents = try URLComponentsBuilder(url: parameters.url)
-            .withQueryParameters(parameters: parameters.query)
+            .withQueryParameters(parameters: parameters.queryParameters)
             .build()
         
         guard let url = urlComponents.url else {
             throw HttpClientError.invalidURL
         }
         
-        var headers: [String: String]? = nil
-        if let headerPairs = parameters.headers?.map({($0.key, $0.value) }) {
-            headers = .init(uniqueKeysWithValues: headerPairs)
-        }
-        
         let request = URLRequestBuilder(url: url, method: parameters.method.rawValue)
-            .withBodyParameters(parameters.body)
-            .withHeaders(headers)
+            .withBodyParameters(parameters.bodyParameters)
+            .withHeaders(parameters.headers)
             .build()
         
-        return .init(request: request)
+        return .init(urlRequest: request)
     }
 }
 
@@ -66,7 +48,7 @@ internal final class URLComponentsBuilder {
     private let url: String
     
     /// URL query parameters dictionary.
-    private var queryParameters: QueryParameters?
+    private var queryParameters: QueryParameters = [:]
     
     /// Initializer.
     /// - parameter url: URL string.
@@ -77,7 +59,7 @@ internal final class URLComponentsBuilder {
     /// Adds query parameters for the URLComponents instance.
     /// - parameter parameters: URL query parameters dictionary.
     /// - returns: An instance of URLComponentsBuilder.
-    public func withQueryParameters(parameters: QueryParameters?) -> Self {
+    public func withQueryParameters(parameters: QueryParameters) -> Self {
         queryParameters = parameters
         return self
     }
@@ -90,7 +72,12 @@ internal final class URLComponentsBuilder {
             throw HttpClientError.invalidURL
         }
         
-        urlComponents.queryItems = queryParameters?.map { .init(name: $0.key, value: $0.value) }
+        if !queryParameters.isEmpty {
+            urlComponents.queryItems = queryParameters.map {
+                .init(name: $0.key, value: $0.value)
+            }
+        }
+        
         return urlComponents
     }
 }
@@ -110,10 +97,10 @@ internal final class URLRequestBuilder {
     private let method: String
     
     /// Request body parameters dictionary.
-    private var bodyParameters: BodyParameters?
+    private var bodyParameters: BodyParameters = [:]
     
     /// Request headers dictionary.
-    private var headers: Headers?
+    private var headers: Headers = [:]
     
     /// Initializer.
     /// - parameter url: An instance of URL
@@ -126,7 +113,7 @@ internal final class URLRequestBuilder {
     /// Adds request body parameters for the URLRequest instance.
     /// - parameter parameters: Request body parameters dictionary.
     /// - returns: An instance of URLRequestBuilder.
-    public func withBodyParameters(_ bodyParameters: BodyParameters?) -> URLRequestBuilder {
+    public func withBodyParameters(_ bodyParameters: BodyParameters) -> URLRequestBuilder {
         self.bodyParameters = bodyParameters
         return self
     }
@@ -134,7 +121,7 @@ internal final class URLRequestBuilder {
     /// Adds request headers for the URLRequest instance.
     /// - parameter parameters: Request headers dictionary.
     /// - returns: An instance of URLRequestBuilder.
-    public func withHeaders(_ headers: Headers?) -> URLRequestBuilder {
+    public func withHeaders(_ headers: Headers) -> URLRequestBuilder {
         self.headers = headers
         return self
     }
@@ -145,12 +132,14 @@ internal final class URLRequestBuilder {
         var request = URLRequest(url: url)
         request.httpMethod = method
         
-        if let body = bodyParameters {
-            request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
+        if !bodyParameters.isEmpty {
+            request.httpBody = try? JSONSerialization.data(withJSONObject: bodyParameters, options: [])
         }
         
-        if let headers = headers {
-            headers.forEach { request.setValue($0.value, forHTTPHeaderField: $0.key) }
+        if !headers.isEmpty {
+            headers.forEach {
+                request.setValue($0.value, forHTTPHeaderField: $0.key)
+            }
         }
         
         return request

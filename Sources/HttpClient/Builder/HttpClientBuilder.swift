@@ -8,27 +8,54 @@
 import Foundation
 
 /// HttpClientBuilder class.
-public final class HttpClientBuilder {
-    /// Response error transform closure.
-    private var responseErrorTransformer: HttpResponseErrorTransformer?
+public final class HttpClientBuilder: HttpClientBuilderProtocol {
+    /// HttpClientRequestBuilderProtocol instance.
+    private var requestBuilder: HttpClientRequestBuilderProtocol
     
-    /// Initializer.
-    public init() {}
+    /// HttpClientExecutorBuilderProtocol instance.
+    private var executorBuilder: HttpClientExecutorBuilderProtocol
     
-    /// Adds transform closure for the HttpClient instance.
-    /// - parameter transform: Response error transform closure.
+    /// HttpClientResponseHandlerBuilderProtocol instance.
+    private var responseHandlerBuilder: HttpClientResponseHandlerBuilderProtocol
+    
+    /// Create a new HttpClientBuilder instance.
+    public init() {
+        requestBuilder = HttpClientRequestBuilder()
+        executorBuilder = HttpClientExecutorBuilder()
+        responseHandlerBuilder = HttpClientResponseHandlerBuilder(decoder: HttpClientResponseJsonDecoder())
+    }
+    
+    /// Register a HttpClientRequestBuilderProtocol instance.
+    /// - parameter executorBuilder: An instance of HttpClientRequestBuilderProtocol.
     /// - returns: An instance of HttpClientBuilder.
-    public func withMapError(_ transform: HttpResponseErrorTransformer?) -> Self {
-        responseErrorTransformer = transform
+    public func withRequestBuilder(_ requestBuilder: HttpClientRequestBuilderProtocol) -> Self {
+        self.requestBuilder = requestBuilder
         return self
     }
     
-    /// Creates and returns an instance of HttpClient.
-    /// - returns: An instance of HttpClient.
-    public func build() -> HttpClient {
-        let httpClient = HttpClient(requestBuilder: .init())
-        httpClient.responseErrorTransformer = responseErrorTransformer
-        
-        return httpClient
+    /// Register a HttpClientExecutorBuilderProtocol instance.
+    /// - parameter executorBuilder: An instance of HttpClientExecutorBuilderProtocol.
+    /// - returns: An instance of HttpClientBuilder.
+    public func withExecutorBuilder(_ executorBuilder: HttpClientExecutorBuilderProtocol) -> Self {
+        self.executorBuilder = executorBuilder
+        return self
+    }
+    
+    /// Register a HttpClientResponseHandlerBuilderProtocol instance.
+    /// - parameter executorBuilder: An instance of HttpClientRequestBuilderProtocol.
+    /// - returns: An instance of HttpClientBuilder.
+    public func withRequestBuilder(_ responseHandlerBuilder: HttpClientResponseHandlerBuilderProtocol) -> Self {
+        self.responseHandlerBuilder = responseHandlerBuilder
+        return self
+    }
+    
+    /// Create a new HttpClientProtocol instance.
+    /// - returns: An instance of HttpClientProtocol.
+    public func build() -> HttpClientProtocol {
+        HttpClient(
+            requestBuilder: requestBuilder,
+            executorBuilder: executorBuilder,
+            responseHandlerBuilder: responseHandlerBuilder
+        )
     }
 }

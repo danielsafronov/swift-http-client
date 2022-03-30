@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  HttpResponseErrorTransformer.swift
 //  
 //
 //  Created by Daniel Safronov on 29.03.2022.
