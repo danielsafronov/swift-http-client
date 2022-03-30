@@ -9,6 +9,9 @@ import Foundation
 
 /// HttpClientResponseJsonDecoder class.
 public struct HttpClientResponseJsonDecoder: HttpClientResponseDecoderProtocol {
+    /// Create a new HttpClientResponseJsonDecoder instance.
+    public init() {}
+    
     /// Decode an instance of HttpClientResponseProtocol to response type.
     /// - parameter response: An instance of HttpClientResponseProtocol.
     /// - returns: A response instance.
