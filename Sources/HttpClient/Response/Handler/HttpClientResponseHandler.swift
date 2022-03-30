@@ -30,6 +30,10 @@ public struct HttpClientResponseHandler: HttpClientResponseHandlerProtocol {
         }
         
         if statusCode.isSuccess {
+            if Response.self == Data.self {
+                return response.data as! Response
+            }
+            
             return try decoder.decode(response: response)
         } else {
             let error = HttpResponseError(data: response.data, response: response.urlResponse)
