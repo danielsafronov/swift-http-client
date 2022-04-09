@@ -12,14 +12,44 @@ public final class HttpClientRequestBuilder: HttpClientRequestBuilderProtocol {
     /// Request headers transform closure.
     private var requestHeadersTransformer: HttpClientRequestHeadersTransformer?
     
+    /// The default request schema.
+    private var schema: HttpRequestSchema?
+    
+    /// The default request host.
+    private var host: String?
+    
     /// Create a new HttpClientRequestBuilder instance.
     public init() {}
     
+    /// Register request headers transform closure.
+    /// - parameter transform: Request headers transform closure.
+    /// - returns: An instance of HttpClientRequestBuilder.
+    public func withMapHeaders(_ transform: HttpClientRequestHeadersTransformer?) -> Self {
+        requestHeadersTransformer = transform
+        return self
+    }
+    
+    /// Registers the default request schema.
+    /// - parameter schema: An instance of HttpRequestSchema.
+    /// - returns: An instance of HttpClientRequestBuilder.
+    public func withSchema(_ schema: HttpRequestSchema) -> Self {
+        self.schema = schema
+        return self
+    }
+    
+    /// Register the default request host.
+    /// - parameter host: The default request host.
+    /// - returns: An instance of HttpClientRequestBuilder.
+    public func withHost(_ host: String) -> Self {
+        self.host = host
+        return self
+    }
+    
     /// Create a new HttpClientRequestProtocol instance.
-    /// - parameter prameters: An instance of HttpClientRequestParameters.
+    /// - parameter prameters: An instance of HttpClientRequestParametersProtocol.
     /// - returns: An instance of HttpClientRequestProtocol.
     /// - throws: If something went wrong.
-    public func build(with parameters: HttpClientRequestParameters) throws -> HttpClientRequestProtocol {
+    public func build(with parameters: HttpClientRequestParametersProtocol) throws -> HttpClientRequestProtocol {
         try buildHttpClientRequest(parameters: parameters)
     }
     
@@ -27,8 +57,12 @@ public final class HttpClientRequestBuilder: HttpClientRequestBuilderProtocol {
     /// - parameter parameters: An instance of HttpClientRequestParametersProtocol.
     /// - returns: An instance of HttpClientRequest.
     /// - throws: If something went wrong.
-    private func buildHttpClientRequest(parameters: HttpClientRequestParameters) throws -> HttpClientRequest {
-        let urlComponents = try URLComponentsBuilder(url: parameters.url)
+    private func buildHttpClientRequest(parameters: HttpClientRequestParametersProtocol) throws -> HttpClientRequest {
+        guard let resolvedUrl = resolveRequestUrl(parameters: parameters) else {
+            throw HttpClientError.invalidURL
+        }
+        
+        let urlComponents = try URLComponentsBuilder(url: resolvedUrl)
             .withQueryParameters(parameters: parameters.queryParameters)
             .build()
         
@@ -49,12 +83,42 @@ public final class HttpClientRequestBuilder: HttpClientRequestBuilderProtocol {
         return .init(urlRequest: request)
     }
     
-    /// Register request headers transform closure.
-    /// - parameter transform: Request headers transform closure.
-    /// - returns: An instance of HttpClientRequestBuilder.
-    public func withMapHeaders(_ transform: HttpClientRequestHeadersTransformer?) -> Self {
-        requestHeadersTransformer = transform
-        return self
+    /// Resolve request url via parameters and builder registers.
+    /// Returns nil if unable to resolve request url.
+    /// - parameter parameters: An instance of HttpClientRequestParametersProtocol.
+    /// - returns: URL string or nil.
+    private func resolveRequestUrl(parameters: HttpClientRequestParametersProtocol) -> String? {
+        if let url = resolveRequestUrlViaRequestParameters(parameters: parameters) {
+            return url
+        }
+        
+        return resolveRequestUrlViaBuilderConfiguration()
+    }
+    
+    /// Resolve  request url via request parameters instance.
+    /// Returns nil if unable to resolve request url.
+    /// - parameter parameters: An instance of HttpClientRequestParametersProtocol.
+    /// - returns: URL string or nil.
+    private func resolveRequestUrlViaRequestParameters(parameters: HttpClientRequestParametersProtocol) -> String? {
+        guard !parameters.url.isEmpty else {
+            return nil
+        }
+        
+        return parameters.url
+    }
+    
+    /// Resolve request url via request builder instance configuration.
+    /// Returns nil if unable to resolve request url.
+    /// - returns: URL string or nil.
+    private func resolveRequestUrlViaBuilderConfiguration() -> String? {
+        guard
+            let schema = schema?.rawValue,
+            let host = host
+        else {
+            return nil
+        }
+        
+        return "\(schema)://\(host)"
     }
 }
 

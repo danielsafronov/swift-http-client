@@ -10,8 +10,8 @@ import Foundation
 /// HttpClientRequestBuilderProtocol protocol.
 public protocol HttpClientRequestBuilderProtocol {
     /// Create a new HttpClientRequestProtocol instance.
-    /// - parameter prameters: An instance of HttpClientRequestParameters.
+    /// - parameter prameters: An instance of HttpClientRequestParametersProtocol.
     /// - returns: An instance of HttpClientRequestProtocol.
     /// - throws: If something went wrong.
-    func build(with parameters: HttpClientRequestParameters) throws -> HttpClientRequestProtocol
+    func build(with parameters: HttpClientRequestParametersProtocol) throws -> HttpClientRequestProtocol
 }

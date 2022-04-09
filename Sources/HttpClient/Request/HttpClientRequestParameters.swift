@@ -8,7 +8,7 @@
 import Foundation
 
 /// HttpClientRequestParameters structure.
-public struct HttpClientRequestParameters {
+public struct HttpClientRequestParameters: HttpClientRequestParametersProtocol {
     public var url: String
     public var method: HttpRequestMethod
     public var bodyParameters: HttpClientRequestBodyParameters = [:]
@@ -36,5 +36,16 @@ extension HttpClientRequestParameters {
     /// - parameter value: A header value.
     public mutating func withHeader(key: String, value: String) {
         headers[key] = value
+    }
+}
+
+extension HttpClientRequestParameters {
+    /// Initializer.
+    /// - parameter method: An instance of HttpRequestMethod.
+    /// - parameter bodyParameters: Request body parameters dictionary.
+    /// - parameter queryParameters: URL query parameters dictionary.
+    /// - parameter headers: Request headers dictionary.
+    init(method: HttpRequestMethod, bodyParameters: HttpClientRequestBodyParameters = [:], queryParameters: HttpClientRequestQueryParameters = [:], headers: HttpClientRequestHeaders = [:]) {
+        self.init(url: "", method: method, bodyParameters: bodyParameters, queryParameters: queryParameters, headers: headers)
     }
 }
