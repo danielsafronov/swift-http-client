@@ -33,9 +33,9 @@ public struct HttpClient: HttpClientProtocol {
     }
     
     /// Perform HTTP request.
-    /// - parameter endpoint: An instance of HttpClientRequestParameters.
+    /// - parameter parameters: An instance of HttpClientRequestParametersProtocol.
     /// - returns: An instance of Result.
-    public func request<Response>(parameters: HttpClientRequestParameters) async -> Result<Response, Error> where Response: Decodable {
+    public func request<Response>(with parameters: HttpClientRequestParametersProtocol) async -> Result<Response, Error> where Response: Decodable {
         do {
             let httpRequest = try requestBuilder.build(with: parameters)
             let httpResponse = try await executorBuilder.build().execute(request: httpRequest)
